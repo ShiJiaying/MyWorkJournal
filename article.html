@@ -1,0 +1,65 @@
+<!DOCTYPE html>
+<html lang="zh-CN">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>文章 - 我的工作日志</title>
+    <link rel="stylesheet" href="styles.css">
+    <script>
+        window.onload = function() {
+            const article = JSON.parse(sessionStorage.getItem('currentArticle'));
+            if (!article) {
+                window.location.href = 'index.html';
+                return;
+            }
+
+            document.title = `${article.title} - 我的工作日志`;
+            document.getElementById('article-title').textContent = article.title;
+            document.getElementById('article-date').textContent = article.date;
+            
+            // 将文本内容转换为HTML
+            const content = article.content
+                .split('\n\n')
+                .map(paragraph => {
+                    // 检查是否是标题（以 # 开头）
+                    if (paragraph.startsWith('# ')) {
+                        return `<h2>${paragraph.substring(2)}</h2>`;
+                    }
+                    // 检查是否是列表项（以 - 开头）
+                    else if (paragraph.includes('\n- ')) {
+                        const items = paragraph.split('\n- ');
+                        const list = items.slice(1)
+                            .map(item => `<li>${item}</li>`)
+                            .join('');
+                        return `<ul>${list}</ul>`;
+                    }
+                    // 普通段落
+                    else {
+                        return `<p>${paragraph}</p>`;
+                    }
+                })
+                .join('');
+            
+            document.getElementById('article-content').innerHTML = content;
+        };
+    </script>
+</head>
+<body>
+    <header>
+        <div class="container">
+            <h1 class="blog-title"><a href="index.html">我的工作日志</a></h1>
+        </div>
+    </header>
+    
+    <main class="container article-container">
+        <article class="article-content">
+            <h1 id="article-title"></h1>
+            <div class="article-meta">
+                <time id="article-date"></time>
+            </div>
+            <div class="article-body" id="article-content">
+            </div>
+        </article>
+    </main>
+</body>
+</html> 
